@@ -1,7 +1,9 @@
 # Coursera Johns Hopkins Statistical Inference Course Project
 
 For the RPubs of the project go to here: http://rpubs.com/bzhang93
+
 The final PDF files are in the repository for viewing. Please do not copy any work and only use this as a reference. 
+
 The project instructions are below as follows:
 
 
