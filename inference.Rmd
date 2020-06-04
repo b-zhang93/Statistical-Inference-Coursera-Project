@@ -1,0 +1,101 @@
+---
+title: "Statistical Inference Project - Inference"
+author: "Bowen Zhang"
+date: "6/4/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width=5, fig.height=3 )
+library(ggplot2)
+```
+
+
+## Overview
+This report aims to analyze the ToothGrowth data in the R datasets package. The data set looks at tooth growth in guniea pigs by giving them two different supplements (orange juice, vitamin C).
+
+## Load the Data
+```{r load}
+data("ToothGrowth")
+head(ToothGrowth, 3)
+```
+
+## Summary and Exploratory Analysis
+```{r summary}
+summary(ToothGrowth)
+```
+We can see there are two groups VC, OJ. There is also 3 dosages each supplement (0.5, 1, and 2).
+
+Mean tooth growth length for the two supplements:
+```{r}
+round(tapply(ToothGrowth$len, ToothGrowth$supp, mean), 2)
+```
+
+Plot the graph comparing the two means:
+```{r fig1}
+ggplot(aes(x=supp, y=len), data=ToothGrowth) +
+        geom_boxplot(aes(fill = supp)) +
+        labs(x = "Supplement", y = "Length of Tooth Growth", 
+             title = "Mean Tooth Growth by Supplement")
+```
+
+Now we can break this further down by dosage and compare each supplement. Recall our sumary: dosages: 0.5,1,2.
+```{r fig2}
+ToothGrowth$dose<-as.factor(ToothGrowth$dose)
+
+ggplot(aes(x=supp, y=len), data=ToothGrowth) +
+        geom_boxplot(aes(fill=supp)) +
+        facet_grid(.~dose) +
+        labs(x = "Supplement", y = "Length of Tooth Growth", 
+             title = "Tooth Growth per Supplement by Dosage")
+```
+
+## Inference with T-Test
+
+### By Supplements:
+
+H0: Both supplements have the same mean
+
+HA: Means are different
+
+**T-test with 95% confidence interval:**
+```{r}
+t.test(len~supp, data = ToothGrowth)$p.value #p-value
+t.test(len~supp, data = ToothGrowth)$conf #confidence interval
+```
+
+**Findings: ** P-value of 0.06 is greater than our alpha 0.05, and the confidence interval contains zero. This means we cannot reject the Null hypothesis. We have no evidence to support that the supplements have any effect on tooth growth of guinea pigs. 
+
+### By Dosage:
+
+H0: Means are the same between lower and higher level dosages
+
+HA: Higher dosage mean is greater than lower dosage means 
+
+
+**Test A: Comparing dosage 0.5 and 1:**
+```{r}
+with(ToothGrowth, t.test(len[dose== 1], len[dose == 0.5])$p.value) #p-value
+with(ToothGrowth, t.test(len[dose== 1], len[dose == 0.5])$conf) #confidence interval
+```
+
+**Test B: Comparing dosage 1 and 2:**
+```{r}
+with(ToothGrowth, t.test(len[dose== 2], len[dose == 1])$p.value) #p-value
+with(ToothGrowth, t.test(len[dose== 2], len[dose == 1])$conf) #confidence interval
+```
+
+**Findings: ** For both tests, we found that a single step increase in dosage (from 0.5 to 1 or 1 to 2), the p-value is lower than 0.05 and the confidence intervals do not overlap zero. Therefore, we can safely reject the null hypothesis. We seem to have evidence to show that there is a change with mean growth based on the dosage. 
+
+## Conclusions
+
+**Assumptions: ** Populations are independent, Sample represents the population, subjects are randomized.
+
+**Conclusion: **
+According to the t-tests we can conclude that there seems to be no evidence to suggest that the different supplements have an effect on tooth growth that is statistically significant enough. However, when we compare dosages administered, we find that from both 0.5 to 1 and 1 to 2, there is enough evidence to reject the null and accept the alternative that different dosages do have an effect on tooth growth. We see that change being an increase in mean growth when the dosage is increased. Also, since we found that increasing dosages from 0.5 to 1 increases growth and 1 to 2 increases growth, too, we can infer that 0.5 to 2 increases growth as well by logic. 
+
+
+
+
+
+
